@@ -37,7 +37,10 @@ from models.deadline_extractor import extract_deadlines
 
 app = Flask(__name__)
 
-app.secret_key = "legal_document_analyzer_secret_key"
+app.secret_key = os.environ.get(
+    "SECRET_KEY",
+    "development-only-secret-key"
+)
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -56,7 +59,6 @@ os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 # ==========================================
 
 def allowed_file(filename):
-
     return (
         "." in filename
         and filename.rsplit(".", 1)[1].lower()
@@ -70,7 +72,6 @@ def allowed_file(filename):
 
 @app.route("/")
 def home():
-
     return render_template("index.html")
 
 
@@ -108,9 +109,14 @@ def analyze():
         flash("Invalid filename.")
         return redirect(url_for("home"))
 
+    # Generate a unique temporary filename to avoid collisions
+    import uuid
+
+    unique_name = f"{uuid.uuid4().hex}_{original_name}"
+
     file_path = os.path.join(
         app.config["UPLOAD_FOLDER"],
-        original_name
+        unique_name
     )
 
     # Save uploaded document
@@ -142,11 +148,9 @@ def analyze():
         summary_error = None
 
         try:
-
             summary = generate_summary(document_text)
 
         except Exception as error:
-
             print("Summarization Error:", error)
 
             summary = (
@@ -170,8 +174,6 @@ def analyze():
         semantic_error = None
 
         try:
-
-            # Lazy import: load the semantic model when needed
             from models.semantic_cuad_matcher import (
                 detect_semantic_clauses
             )
@@ -181,7 +183,6 @@ def analyze():
             )
 
         except Exception as error:
-
             print("CUAD Semantic Matching Error:", error)
 
             semantic_clauses = []
@@ -209,7 +210,6 @@ def analyze():
         )
 
     except Exception as error:
-
         print("Document Analysis Error:", error)
 
         flash(
@@ -219,7 +219,6 @@ def analyze():
         return redirect(url_for("home"))
 
     finally:
-
         # Remove temporary uploaded document
         if os.path.exists(file_path):
             os.remove(file_path)
@@ -246,7 +245,7 @@ def file_too_large(error):
 if __name__ == "__main__":
 
     app.run(
-        debug=True,
-        host="127.0.0.1",
-        port=5000
+        debug=False,
+        host="0.0.0.0",
+        port=int(os.environ.get("PORT", 5000))
     )
