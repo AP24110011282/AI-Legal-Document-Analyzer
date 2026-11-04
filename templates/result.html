@@ -1,0 +1,424 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>AI Legal Document Analyzer - Results</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f1f5f9;
+            color: #1e293b;
+            line-height: 1.6;
+        }
+
+        header {
+            background: #172554;
+            color: white;
+            padding: 25px 7%;
+        }
+
+        header h1 {
+            font-size: 27px;
+        }
+
+        header p {
+            color: #cbd5e1;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        .section {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 22px;
+            box-shadow: 0 2px 8px #0000000c;
+        }
+
+        h2 {
+            color: #172554;
+            margin-bottom: 18px;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 10px;
+        }
+
+        h3 {
+            margin: 10px 0;
+            color: #334155;
+        }
+
+        .info {
+            background: #eff6ff;
+            padding: 18px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 12px;
+        }
+
+        th, td {
+            padding: 12px;
+            border: 1px solid #e2e8f0;
+            text-align: left;
+            overflow-wrap: anywhere;
+        }
+
+        th {
+            background: #172554;
+            color: white;
+        }
+
+        tr:nth-child(even) {
+            background: #f8fafc;
+        }
+
+        .item {
+            padding: 16px;
+            background: #f8fafc;
+            border-left: 4px solid #2563eb;
+            border-radius: 6px;
+            margin: 12px 0;
+        }
+
+        .category {
+            display: inline-block;
+            background: #dbeafe;
+            color: #1e40af;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .score {
+            display: inline-block;
+            background: #dcfce7;
+            color: #166534;
+            padding: 5px 10px;
+            margin: 5px 5px 5px 0;
+            border-radius: 5px;
+            font-size: 13px;
+        }
+
+        .risk {
+            border-left-color: #dc2626;
+        }
+
+        .warning {
+            background: #fff7ed;
+            padding: 15px;
+            border-left: 4px solid #f97316;
+            margin-top: 15px;
+            border-radius: 5px;
+        }
+
+        .summary {
+            white-space: pre-wrap;
+        }
+
+        .empty {
+            color: #64748b;
+            font-style: italic;
+        }
+
+        .button {
+            display: inline-block;
+            background: #172554;
+            color: white;
+            padding: 12px 22px;
+            text-decoration: none;
+            border-radius: 6px;
+            margin-bottom: 25px;
+        }
+
+        .button:hover {
+            background: #1e40af;
+        }
+
+        footer {
+            text-align: center;
+            padding: 25px;
+            color: #64748b;
+        }
+
+        @media(max-width: 650px) {
+            .section {
+                padding: 15px;
+                overflow-x: auto;
+            }
+
+            table {
+                min-width: 450px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <h1>AI Legal Document Analyzer</h1>
+    <p>Intelligent Contract Analysis and CUAD Semantic Matching</p>
+</header>
+
+<div class="container">
+
+    <!-- DOCUMENT INFORMATION -->
+
+    <div class="info">
+        <h2>Document Information</h2>
+        <p><strong>File:</strong> {{ filename }}</p>
+        <p><strong>Word Count:</strong> {{ word_count }}</p>
+    </div>
+
+    <!-- DISCLAIMER -->
+
+    <div class="warning">
+        <strong>Legal Disclaimer:</strong>
+        This application provides informational analysis only.
+        It does not provide legal advice. Results should be reviewed
+        by a qualified legal professional.
+    </div>
+
+    <!-- 1. SUMMARY -->
+
+    <div class="section">
+        <h2>1. AI Document Summary</h2>
+
+        {% if summary %}
+            <p class="summary">{{ summary }}</p>
+        {% else %}
+            <p class="empty">No summary available.</p>
+        {% endif %}
+
+        {% if summary_error %}
+            <div class="warning">
+                Summary error: {{ summary_error }}
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- 2. ENTITIES -->
+
+    <div class="section">
+        <h2>2. Entity Extraction</h2>
+
+        {% if entities %}
+        <table>
+            <tr>
+                <th>Entity Type</th>
+                <th>Extracted Value</th>
+            </tr>
+
+            {% for entity in entities %}
+            <tr>
+                <td>{{ entity.label }}</td>
+                <td>{{ entity.text }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+        {% else %}
+            <p class="empty">No entities detected.</p>
+        {% endif %}
+    </div>
+
+    <!-- 3. CLAUSES -->
+
+    <div class="section">
+        <h2>3. Clause Extraction</h2>
+
+        {% if clauses %}
+            {% for clause in clauses %}
+            <div class="item">
+                <h3>{{ clause.clause }}</h3>
+                <p>{{ clause.content }}</p>
+            </div>
+            {% endfor %}
+        {% else %}
+            <p class="empty">No clauses detected.</p>
+        {% endif %}
+    </div>
+
+    <!-- 4. OBLIGATIONS -->
+
+    <div class="section">
+        <h2>4. Obligation Extraction</h2>
+
+        {% if obligations %}
+            {% for obligation in obligations %}
+            <div class="item">
+
+                <span class="category">
+                    {{ obligation.category }}
+                </span>
+
+                <p>{{ obligation.text }}</p>
+
+            </div>
+            {% endfor %}
+        {% else %}
+            <p class="empty">No obligations detected.</p>
+        {% endif %}
+    </div>
+
+    <!-- 5. RISKS -->
+
+    <div class="section">
+        <h2>5. Legal Risk Detection</h2>
+
+        {% if risks %}
+            {% for risk in risks %}
+            <div class="item risk">
+
+                <h3>{{ risk.title }}</h3>
+
+                <p>
+                    <strong>Risk Level:</strong>
+                    {{ risk.risk_level }}
+                </p>
+
+                <p>
+                    <strong>Reason:</strong>
+                    {{ risk.reason }}
+                </p>
+
+                <p>
+                    <strong>Evidence:</strong>
+                    {{ risk.evidence }}
+                </p>
+
+                <p>
+                    <strong>Recommendation:</strong>
+                    {{ risk.recommendation }}
+                </p>
+
+            </div>
+            {% endfor %}
+        {% else %}
+            <p class="empty">No risks detected.</p>
+        {% endif %}
+    </div>
+
+    <!-- 6. DEADLINES -->
+
+    <div class="section">
+        <h2>6. Dates and Deadlines</h2>
+
+        {% if deadlines %}
+        <table>
+            <tr>
+                <th>Type</th>
+                <th>Value</th>
+                <th>ISO Date</th>
+                <th>Context</th>
+            </tr>
+
+            {% for deadline in deadlines %}
+            <tr>
+                <td>{{ deadline.type }}</td>
+                <td>{{ deadline.value }}</td>
+                <td>
+                    {{ deadline.iso_date if deadline.iso_date else "Not applicable" }}
+                </td>
+                <td>{{ deadline.context }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+        {% else %}
+            <p class="empty">No dates or deadlines detected.</p>
+        {% endif %}
+    </div>
+
+    <!-- 7. CUAD SEMANTIC MATCHING -->
+
+    <div class="section">
+        <h2>7. CUAD Semantic Clause Detection</h2>
+
+        <p>
+            This module compares document sentences with descriptions
+            of 41 CUAD contract categories.
+        </p>
+
+        {% if semantic_error %}
+
+            <div class="warning">
+                {{ semantic_error }}
+            </div>
+
+        {% elif semantic_clauses %}
+
+            {% for item in semantic_clauses %}
+
+            <div class="item">
+
+                <span class="category">
+                    {{ item.category }}
+                </span>
+
+                <h3>Matched Sentence</h3>
+
+                <p>{{ item.sentence }}</p>
+
+                <br>
+
+                <span class="score">
+                    Similarity:
+                    {{ "%.3f"|format(item.similarity|float) }}
+                </span>
+
+                <span class="score">
+                    Matching Method:
+                    {{ item.matching_method|default("semantic", true) }}
+                </span>
+
+            </div>
+
+            {% endfor %}
+
+        {% else %}
+
+            <p class="empty">
+                No sufficiently strong semantic matches detected.
+            </p>
+
+        {% endif %}
+
+        <div class="warning">
+            Semantic similarity is an experimental matching indicator,
+            not a legal confidence score. The model has not been
+            fine-tuned or validated for legal decisions.
+        </div>
+    </div>
+
+    <!-- BACK BUTTON -->
+
+    <a href="{{ url_for('home') }}" class="button">
+        Analyze Another Document
+    </a>
+
+</div>
+
+<footer>
+    AI Legal Document Analyzer | Academic Project
+</footer>
+
+</body>
+</html>

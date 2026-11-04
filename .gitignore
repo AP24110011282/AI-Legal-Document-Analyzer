@@ -1,0 +1,9 @@
+
+cuad/
+
+__pycache__/
+*.py[cod]
+uploads/*
+!uploads/.gitkeep
+
+dataset/processed/cuad_training_data.json
